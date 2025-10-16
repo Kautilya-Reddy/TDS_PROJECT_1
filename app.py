@@ -28,7 +28,7 @@ def home():
     return {"status": "ok", "message": "LLM App Deployment API is running."}
 
 
-@app.post("/task")
+@app.post("/api-endpoint")
 def receive_task(task: TaskRequest):
     print(f"📥 Received task: {task.task} (Round {task.round})")
 
