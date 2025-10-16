@@ -1,6 +1,8 @@
 from github_utils import create_repo, upload_file, enable_pages
 import random
 import time
+import os, requests
+
 
 def generate_app(task_name, brief=None):
     # Create a unique repo name
@@ -66,8 +68,35 @@ def generate_app(task_name, brief=None):
     print("✅ Deployment completed successfully!")
     print("🌐 Pages URL:", pages_url)
 
+    # Step 4: Fetch latest commit SHA from GitHub
+    import requests
+    headers = {"Authorization": f"token {os.getenv('GITHUB_TOKEN')}"}
+    sha_url = f"https://api.github.com/repos/{repo_full_name}/commits/main"
+    sha_response = requests.get(sha_url, headers=headers)
+    commit_sha = None
+    if sha_response.status_code == 200:
+        commit_sha = sha_response.json().get("sha")
+    else:
+        print(f"⚠️ Could not fetch commit SHA: {sha_response.text}")
+        commit_sha = "unknown"
+
+    # Step 5: Return full deployment info
+    # Step 4: Fetch latest commit SHA from GitHub
+    headers = {"Authorization": f"token {os.getenv('GITHUB_TOKEN')}"}
+    sha_url = f"https://api.github.com/repos/{repo_full_name}/commits/main"
+    sha_response = requests.get(sha_url, headers=headers, timeout=20)
+    commit_sha = None
+    if sha_response.status_code == 200:
+        commit_sha = sha_response.json().get("sha")
+    else:
+        print(f"⚠️ Could not fetch commit SHA: {sha_response.text}")
+        commit_sha = "unknown"
+
+    # Step 5: Return full deployment info
     return {
         "repo_url": repo_data["html_url"],
-        "commit_sha": repo_data["default_branch"],
+        "commit_sha": commit_sha,
         "pages_url": pages_url
     }
+
+
